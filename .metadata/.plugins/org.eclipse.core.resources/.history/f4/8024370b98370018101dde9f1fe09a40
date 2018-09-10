@@ -1,0 +1,97 @@
+package com.shiva.blessing.shiva;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.regex.Pattern;
+
+import org.apache.logging.log4j.Logger;
+import org.springframework.util.AntPathMatcher;
+
+public class PDJFAuthorizationMappingTest {
+	
+
+	private Logger logger;
+	private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\{[^/]+?\\}");
+	public PDJFAuthorizationMappingTest() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	
+	
+	public static final Map<String,String> patternConfigMapper = new HashMap<>();
+	public static final String[] PATH = {"/*/***/*/home.xhtml" ,"/*/**/**test.xhtml","/**/*/*t/*te/*tes/testing.xhtml"};
+
+	static{
+	
+	patternConfigMapper.put("/**/*", "authenticated");
+	patternConfigMapper.put("/**/*.xhtml", "authenticated-1");
+	patternConfigMapper.put("/**", "authenticated-2");
+	patternConfigMapper.put("/**/*", "authenticated-3");
+	patternConfigMapper.put("/**/*", "authenticated-4");
+	patternConfigMapper.put("/**/signLocation.xhtml", "=hasAllRoles('pd-jpoc-applicant,pd-jpoc-user') and userAttributes['DISTRICT'] == '04'");
+	patternConfigMapper.put("/ecms/ecmsStates.xhtml", "evalConditionCode('ECPRSRCND') and hasNoneRoles('pd-jpoc-applicant,pd-jpoc-user') and (sessionAuthzAttributes['ATTR_AZ_ADR_CREATED'] == true)");
+	patternConfigMapper.put("/ecms/ecmsPropertySearch.xhtml", "(remoteAddress == '127.0.0.1') and (calendar.get(calendar.DAY_OF_WEEK) == calendar.THURSDAY)");
+	}
+
+	
+	
+	public static void main (String[] args)
+	{
+		 Set<String> exprList = new HashSet<String>();
+		 AntPathMatcher matcher = new AntPathMatcher();
+		 LinkedList<String> urlStack = new LinkedList<>();
+		 for(String temp:patternConfigMapper.keySet())
+		 {
+			 urlStack.add(temp); 
+		 }
+		 
+		for (String path:PATH) 
+		{
+		 
+		 Collections.sort(urlStack, matcher.getPatternComparator(path));
+		 
+		 
+		 Map <String,String> sortedTreeMap = new TreeMap<>();
+		
+			 
+			 for (Map.Entry<String, String> entry : patternConfigMapper.entrySet())
+			 {
+			   
+			     for(String key2:urlStack)
+				 {
+					 if(key2.equalsIgnoreCase(entry.getKey()))
+					 {
+						 sortedTreeMap.put(key2, entry.getValue());
+					 }
+					 
+				 }
+			 }
+			 System.out.println("*******Next Path****** ---->    " + path + "\n");
+		 
+			 for (Map.Entry<String, String> entry : sortedTreeMap.entrySet())
+			 {
+			     System.out.println("Key: " + entry.getKey() + ". Value: " + entry.getValue() +"\n");
+			 }
+			
+	    }
+	
+			
+	}
+		}
+		
+
+
+
+
+	
+
+
+
+	
+
